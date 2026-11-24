@@ -7,8 +7,9 @@ test "$(git ls-tree -r --name-only "$base_sha" | wc -l)" -ge 10
 if gh repo view "$owner/$repo" >/dev/null 2>&1; then
   test "$(gh pr list --repo "$owner/$repo" --state all --json number --jq length)" = "0" || { echo PUBLISH_DENIED:repository-has-prs >&2; exit 72; }
   test "$(gh release list --repo "$owner/$repo" --json tagName --jq length)" = "0" || { echo PUBLISH_DENIED:repository-has-releases >&2; exit 72; }
-  remote_main=$(gh api "repos/$owner/$repo/git/ref/heads/main" --jq .object.sha 2>/dev/null || true)
-  remote_product=$(gh api "repos/$owner/$repo/git/ref/heads/$branch" --jq .object.sha 2>/dev/null || true)
+  refs_json=$(gh api "repos/$owner/$repo/git/matching-refs/heads")
+  remote_main=$(printf '%s' "$refs_json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).find(x=>x.ref==="refs/heads/main");if(r)process.stdout.write(r.object.sha)})')
+  remote_product=$(printf '%s' "$refs_json" | BRANCH="$branch" node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).find(x=>x.ref===`refs/heads/${process.env.BRANCH}`);if(r)process.stdout.write(r.object.sha)})')
   if [[ -n "$remote_main" ]]; then
     test "$remote_main" = "$base_sha" || { echo PUBLISH_DENIED:unexpected-main >&2; exit 72; }
   else
@@ -18,7 +19,7 @@ if gh repo view "$owner/$repo" >/dev/null 2>&1; then
   expected_refs=0
   [[ -n "$remote_main" ]] && ((expected_refs += 1))
   [[ -n "$remote_product" ]] && ((expected_refs += 1))
-  actual_refs=$(gh api "repos/$owner/$repo/git/matching-refs/heads" --jq length)
+  actual_refs=$(printf '%s' "$refs_json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(String(JSON.parse(s).length)))')
   test "$actual_refs" -eq "$expected_refs" || { echo PUBLISH_DENIED:unexpected-branches >&2; exit 72; }
 else
   gh repo create "$owner/$repo" --public --description "Evidence-bearing supplier AI amendment impact studio"
