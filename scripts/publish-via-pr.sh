@@ -16,7 +16,10 @@ if gh repo view "$owner/$repo" >/dev/null 2>&1; then
   else
     test "$(gh api "repos/$owner/$repo" --jq .size)" = "0" || { echo PUBLISH_DENIED:repository-not-empty >&2; exit 72; }
   fi
-  [[ -z "$remote_product" || "$remote_product" = "$source_sha" ]] || { echo PUBLISH_DENIED:unexpected-product-branch >&2; exit 72; }
+  if [[ -n "$remote_product" && "$remote_product" != "$source_sha" ]]; then
+    git cat-file -e "$remote_product^{commit}" 2>/dev/null || { echo PUBLISH_DENIED:unknown-product-commit >&2; exit 72; }
+    git merge-base --is-ancestor "$remote_product" "$source_sha" || { echo PUBLISH_DENIED:non-fast-forward-product-branch >&2; exit 72; }
+  fi
   expected_refs=0
   [[ -n "$remote_main" ]] && ((expected_refs += 1))
   [[ -n "$remote_product" ]] && ((expected_refs += 1))
@@ -32,9 +35,19 @@ else
   git remote add origin "$remote"
 fi
 if [[ -z "$remote_main" ]]; then
-  git push origin "$base_sha:refs/heads/main" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-main-push.log"
+  if ! git push origin "$base_sha:refs/heads/main" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-main-push.log"; then
+    observed_main=$(gh api "repos/$owner/$repo/git/ref/heads/main" --jq .object.sha 2>/dev/null || true)
+    test "$observed_main" = "$base_sha" || exit 73
+  fi
+  test "$(gh api "repos/$owner/$repo/git/ref/heads/main" --jq .object.sha)" = "$base_sha"
 fi
-git push origin "$source_sha:refs/heads/$branch" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-product-push.log"
+if [[ "$remote_product" != "$source_sha" ]]; then
+  if ! git push origin "$source_sha:refs/heads/$branch" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-product-push.log"; then
+    observed_product=$(gh api "repos/$owner/$repo/git/ref/heads/$branch" --jq .object.sha 2>/dev/null || true)
+    test "$observed_product" = "$source_sha" || exit 73
+  fi
+fi
+test "$(gh api "repos/$owner/$repo/git/ref/heads/$branch" --jq .object.sha)" = "$source_sha"
 stage=$(mktemp -d); trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/product-evidence" "$stage/seed/selection-evidence"
 cp -a "${DREAM_MACHINE_EVIDENCE_DIR:?}"/. "$stage/product-evidence/"
