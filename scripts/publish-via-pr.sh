@@ -4,6 +4,7 @@ owner=nicholas-ruest; repo=clauseforge; branch=product/clauseforge-2026-11-23
 test "$(gh api user --jq .login)" = "$owner" || { echo PUBLISH_DENIED:wrong-owner >&2; exit 71; }
 test -z "$(git status --porcelain)"; source_sha=$(git rev-parse HEAD); base_sha=$(git rev-list --max-parents=0 HEAD)
 test "$(git ls-tree -r --name-only "$base_sha" | wc -l)" -ge 10
+remote_main=""; remote_product=""
 if gh repo view "$owner/$repo" >/dev/null 2>&1; then
   test "$(gh pr list --repo "$owner/$repo" --state all --json number --jq length)" = "0" || { echo PUBLISH_DENIED:repository-has-prs >&2; exit 72; }
   test "$(gh release list --repo "$owner/$repo" --json tagName --jq length)" = "0" || { echo PUBLISH_DENIED:repository-has-releases >&2; exit 72; }
@@ -30,7 +31,10 @@ if git remote get-url origin >/dev/null 2>&1; then
 else
   git remote add origin "$remote"
 fi
-git push origin "$base_sha:refs/heads/main"; git push origin "$source_sha:refs/heads/$branch"
+if [[ -z "$remote_main" ]]; then
+  git push origin "$base_sha:refs/heads/main" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-main-push.log"
+fi
+git push origin "$source_sha:refs/heads/$branch" 2>&1 | tee "$DREAM_MACHINE_EVIDENCE_DIR/publisher-product-push.log"
 stage=$(mktemp -d); trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/product-evidence" "$stage/seed/selection-evidence"
 cp -a "${DREAM_MACHINE_EVIDENCE_DIR:?}"/. "$stage/product-evidence/"
