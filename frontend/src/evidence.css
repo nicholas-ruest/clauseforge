@@ -1,0 +1,27 @@
+.upstream-receipts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem;
+  margin: 1.2rem 0;
+}
+.upstream-receipts article {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .3rem .75rem;
+  padding: .75rem;
+  border: 1px solid var(--line);
+  background: #0a191b;
+}
+.upstream-receipts h4 { margin: 0; font-size: .7rem; }
+.upstream-receipts strong { font: 500 .7rem DM Mono; color: var(--mint); }
+.upstream-receipts code {
+  grid-column: 1 / -1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #6f8e90;
+  font-size: .6rem;
+}
+@media(max-width: 850px) {
+  .upstream-receipts { grid-template-columns: 1fr; }
+}

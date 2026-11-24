@@ -46,9 +46,19 @@ pub fn retrieve_neighbors(
             config.required_marker
         )));
     }
+    let fields: Vec<&str> = text.trim().split(':').collect();
+    let matches = fields
+        .get(1)
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(0.0);
+    let controls = fields
+        .get(2)
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64);
+    let score = (controls + matches * 5.0).clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-ruvector".into(),
-        score: 100.0,
+        score,
         message: "retrieve similar obligation and control neighborhoods".into(),
         evidence: vec![text.trim().into()],
     })

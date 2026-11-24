@@ -46,9 +46,16 @@ pub fn generate_policy_actions(
             config.required_marker
         )));
     }
+    let score = text
+        .trim()
+        .split(':')
+        .next_back()
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64)
+        .clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-logact".into(),
-        score: 100.0,
+        score,
         message: "generate enforceable mitigation actions".into(),
         evidence: vec![text.trim().into()],
     })

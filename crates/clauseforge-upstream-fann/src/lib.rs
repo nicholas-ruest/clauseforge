@@ -46,9 +46,15 @@ pub fn infer_risk(
             config.required_marker
         )));
     }
+    let fields: Vec<&str> = text.trim().split(':').collect();
+    let raw = fields
+        .get(1)
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64 / 100.0);
+    let score = ((raw + 1.0) * 50.0).clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-fann".into(),
-        score: 100.0,
+        score,
         message: "infer calibrated amendment risk".into(),
         evidence: vec![text.trim().into()],
     })

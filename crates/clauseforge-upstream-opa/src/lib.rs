@@ -48,7 +48,7 @@ pub fn evaluate_policy(
     }
     Ok(StageResult {
         stage: "upstream-opa".into(),
-        score: 100.0,
+        score: 0.0,
         message: "evaluate authorization policy".into(),
         evidence: vec![text.trim().into()],
     })

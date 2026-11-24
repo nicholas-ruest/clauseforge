@@ -3,6 +3,7 @@ import {readFileSync,writeFileSync} from "node:fs";
 import {fileURLToPath} from "node:url";
 
 function tsType(schema){
+  if(schema.$ref)return schema.$ref.split("/").at(-1);
   if(schema.type==="string")return "string";
   if(schema.type==="integer"||schema.type==="number")return "number";
   if(schema.type==="boolean")return "boolean";

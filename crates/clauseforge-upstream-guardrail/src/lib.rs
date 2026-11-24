@@ -48,7 +48,7 @@ pub fn validate_clause_structure(
     }
     Ok(StageResult {
         stage: "upstream-guardrail".into(),
-        score: 100.0,
+        score: 0.0,
         message: "validate the approved amendment clause structure".into(),
         evidence: vec![text.trim().into()],
     })

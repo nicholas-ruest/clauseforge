@@ -46,9 +46,16 @@ pub fn aggregate_stream(
             config.required_marker
         )));
     }
+    let score = text
+        .trim()
+        .split(':')
+        .nth(1)
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64)
+        .clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-midstream".into(),
-        score: 100.0,
+        score,
         message: "aggregate bounded telemetry stream".into(),
         evidence: vec![text.trim().into()],
     })

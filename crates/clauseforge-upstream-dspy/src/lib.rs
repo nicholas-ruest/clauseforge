@@ -46,9 +46,20 @@ pub fn rank_clause_priority(
             config.required_marker
         )));
     }
+    let score_values = text.trim().split(':').nth(2).unwrap_or_default();
+    let scores: Vec<f64> = score_values
+        .split(',')
+        .filter_map(|v| v.parse::<f64>().ok())
+        .collect();
+    let score = if scores.is_empty() {
+        request.affected_controls as f64
+    } else {
+        scores.iter().sum::<f64>() / scores.len() as f64
+    }
+    .clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-dspy".into(),
-        score: 100.0,
+        score,
         message: "publish correlated amendment event".into(),
         evidence: vec![text.trim().into()],
     })

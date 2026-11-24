@@ -8,12 +8,19 @@ export type SubmitAmendment = {
   cure_days: number;
 };
 
+export type StageEvidence = {
+  stage: string;
+  score: number;
+  evidence: string[];
+};
+
 export type AmendmentResponse = {
   id: string;
   correlation_id: string;
   status: string;
   risk_score: number;
   stages: string[];
+  stage_evidence: StageEvidence[];
   evidence_hash: string;
 };
 

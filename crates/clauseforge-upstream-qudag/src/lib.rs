@@ -48,7 +48,7 @@ pub fn seal_envelope(
     }
     Ok(StageResult {
         stage: "upstream-qudag".into(),
-        score: 100.0,
+        score: 0.0,
         message: "seal post-quantum command envelope".into(),
         evidence: vec![text.trim().into()],
     })

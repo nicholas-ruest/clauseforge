@@ -11,6 +11,10 @@ test("[journey:primary] reviewer completes a source-bound amendment",async({page
   await page.getByRole("button",{name:/analyze amendment impact/i}).click();
   await expect(page.getByText("Impact review completed")).toBeVisible({timeout:120_000});
   await expect(page.getByTestId("result")).toContainText("18 accountable stages");
+  const receipts=page.getByRole("article").filter({has:page.getByText(/upstream-/)});
+  await expect(page.getByLabel("Upstream evidence receipts")).toContainText("upstream-ruvector");
+  await expect(page.getByLabel("Upstream evidence receipts")).toContainText("similarity_set");
+  await expect(receipts.first()).toBeVisible();
   await page.screenshot({path:"../.evidence/screenshots/primary-desktop.png",fullPage:true});
 });
 
@@ -33,6 +37,8 @@ test("[journey:durable-retrieval] refresh renders saved hash-chain evidence",asy
   await page.goto("/");
   await page.getByRole("button",{name:/audit ledger/i}).click();
   await expect(page.getByTestId("evidence-card").first()).toBeVisible();
+  await expect(page.getByTestId("evidence-card").first()).toContainText("Upstream receipts");
+  await expect(page.getByTestId("evidence-card").first()).toContainText("18");
   const correlation=await page.getByTestId("evidence-card").first().locator("dd").first().textContent();
   await page.reload();
   await page.getByRole("button",{name:/audit ledger/i}).click();
