@@ -1,0 +1,22 @@
+services:
+  clauseforge:
+    build:
+      context: .
+      dockerfile: Containerfile
+    ports: ["8787:8080"]
+    volumes:
+      - clauseforge-data:/data
+      - ${CLAUSEFORGE_UPSTREAM_ROOT:?exact-pinned upstream root required}:/upstreams:ro
+    environment:
+      CLAUSEFORGE_RUVECTOR_CMD: /app/scripts/upstream-runtime/run.sh ruvector
+      CLAUSEFORGE_FANN_CMD: /app/scripts/upstream-runtime/run.sh fann
+      CLAUSEFORGE_MIDSTREAM_CMD: /app/scripts/upstream-runtime/run.sh midstream
+      CLAUSEFORGE_QUDAG_CMD: /app/scripts/upstream-runtime/run.sh qudag
+      CLAUSEFORGE_GUARDRAIL_CMD: /app/scripts/upstream-runtime/run.sh guardrail
+      CLAUSEFORGE_OPA_CMD: /app/scripts/upstream-runtime/run.sh opa
+      CLAUSEFORGE_DSPY_CMD: /app/scripts/upstream-runtime/run.sh dspy
+      CLAUSEFORGE_LOGACT_CMD: /app/scripts/upstream-runtime/run.sh logact
+    security_opt: ["no-new-privileges"]
+    cap_drop: ["ALL"]
+volumes:
+  clauseforge-data: {}

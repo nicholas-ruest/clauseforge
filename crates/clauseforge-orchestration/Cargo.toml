@@ -1,0 +1,20 @@
+[package]
+name = "clauseforge-orchestration"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+clauseforge-kernel = { path = "../clauseforge-kernel" }
+serde.workspace = true
+thiserror.workspace = true
+clauseforge-amendment = { path = "../clauseforge-amendment" }
+clauseforge-identity = { path = "../clauseforge-identity" }
+clauseforge-authorization = { path = "../clauseforge-authorization" }
+clauseforge-validation = { path = "../clauseforge-validation" }
+clauseforge-correlation = { path = "../clauseforge-correlation" }
+clauseforge-deadline = { path = "../clauseforge-deadline" }
+clauseforge-observability = { path = "../clauseforge-observability" }
+clauseforge-risk = { path = "../clauseforge-risk" }
+clauseforge-telemetry = { path = "../clauseforge-telemetry" }
+clauseforge-scheduler = { path = "../clauseforge-scheduler" }

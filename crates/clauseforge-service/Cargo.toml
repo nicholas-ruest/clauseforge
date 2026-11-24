@@ -1,0 +1,47 @@
+[package]
+name = "clauseforge-service"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+clauseforge-kernel = { path = "../clauseforge-kernel" }
+serde.workspace = true
+thiserror.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+clauseforge-amendment = { path = "../clauseforge-amendment" }
+clauseforge-identity = { path = "../clauseforge-identity" }
+clauseforge-authorization = { path = "../clauseforge-authorization" }
+clauseforge-validation = { path = "../clauseforge-validation" }
+clauseforge-correlation = { path = "../clauseforge-correlation" }
+clauseforge-deadline = { path = "../clauseforge-deadline" }
+clauseforge-observability = { path = "../clauseforge-observability" }
+clauseforge-risk = { path = "../clauseforge-risk" }
+clauseforge-telemetry = { path = "../clauseforge-telemetry" }
+clauseforge-evidence = { path = "../clauseforge-evidence" }
+clauseforge-audit = { path = "../clauseforge-audit" }
+clauseforge-persistence = { path = "../clauseforge-persistence" }
+clauseforge-replay = { path = "../clauseforge-replay" }
+clauseforge-scheduler = { path = "../clauseforge-scheduler" }
+clauseforge-orchestration = { path = "../clauseforge-orchestration" }
+clauseforge-upstream-ruvector = { path = "../clauseforge-upstream-ruvector" }
+clauseforge-upstream-fann = { path = "../clauseforge-upstream-fann" }
+clauseforge-upstream-midstream = { path = "../clauseforge-upstream-midstream" }
+clauseforge-upstream-qudag = { path = "../clauseforge-upstream-qudag" }
+clauseforge-upstream-guardrail = { path = "../clauseforge-upstream-guardrail" }
+clauseforge-upstream-opa = { path = "../clauseforge-upstream-opa" }
+clauseforge-upstream-dspy = { path = "../clauseforge-upstream-dspy" }
+clauseforge-upstream-logact = { path = "../clauseforge-upstream-logact" }
+clauseforge-api-schema = { path = "../clauseforge-api-schema" }
+
+[[bin]]
+name = "clauseforge-service"
+path = "src/main.rs"

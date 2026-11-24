@@ -1,0 +1,12 @@
+[package]
+name = "clauseforge-persistence"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+clauseforge-kernel = { path = "../clauseforge-kernel" }
+serde.workspace = true
+thiserror.workspace = true
+serde_json.workspace = true
+clauseforge-evidence = { path = "../clauseforge-evidence" }

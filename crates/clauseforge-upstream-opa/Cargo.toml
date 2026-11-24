@@ -1,0 +1,10 @@
+[package]
+name = "clauseforge-upstream-opa"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+clauseforge-kernel = { path = "../clauseforge-kernel" }
+serde.workspace = true
+thiserror.workspace = true
