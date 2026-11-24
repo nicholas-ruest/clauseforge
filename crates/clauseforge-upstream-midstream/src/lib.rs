@@ -12,7 +12,7 @@ impl AdapterConfig {
         Self {
             command: command.into(),
             args,
-            required_marker: "safety_window".into(),
+            required_marker: "impact_metric".into(),
         }
     }
 }
@@ -24,8 +24,13 @@ pub fn aggregate_stream(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-midstream: {e}")))?;
     if !output.status.success() {

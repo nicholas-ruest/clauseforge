@@ -9,25 +9,25 @@ pub fn schedule(request: &AmendmentRequest) -> Result<StageResult, DomainError> 
             "amendment window is unschedulable".into(),
         ));
     }
-    let recovery = plan::plan_request(request)?;
-    let score = if recovery.slack_days >= 0 {
-        (100.0 - recovery.critical_path_days as f64).clamp(0.0, 100.0)
+    let mitigation = plan::plan_request(request)?;
+    let score = if mitigation.slack_days >= 0 {
+        (100.0 - mitigation.critical_path_days as f64).clamp(0.0, 100.0)
     } else {
-        (50.0 + recovery.slack_days as f64).clamp(0.0, 100.0)
+        (50.0 + mitigation.slack_days as f64).clamp(0.0, 100.0)
     };
     Ok(StageResult {
         stage: "scheduler".into(),
         score,
         message: format!(
-            "scheduled {} recovery tasks with {}-way parallelism",
-            recovery.tasks.len(),
-            recovery.maximum_parallelism
+            "scheduled {} mitigation tasks with {}-way parallelism",
+            mitigation.tasks.len(),
+            mitigation.maximum_parallelism
         ),
         evidence: vec![
             format!("scheduler:{}:{:.2}", request.stable_key(), score),
             format!(
-                "recovery:critical={}:objective={}:slack={}",
-                recovery.critical_path_days, recovery.cure_window_days, recovery.slack_days
+                "mitigation:critical={}:cure={}:slack={}",
+                mitigation.critical_path_days, mitigation.cure_window_days, mitigation.slack_days
             ),
         ],
     })

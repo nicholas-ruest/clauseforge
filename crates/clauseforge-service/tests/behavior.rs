@@ -9,7 +9,7 @@ fn configure() {
     for (name, marker) in [
         ("CLAUSEFORGE_RUVECTOR_CMD", "similarity_set"),
         ("CLAUSEFORGE_FANN_CMD", "calibrated_interval"),
-        ("CLAUSEFORGE_MIDSTREAM_CMD", "safety_window"),
+        ("CLAUSEFORGE_MIDSTREAM_CMD", "impact_metric"),
         ("CLAUSEFORGE_QUDAG_CMD", "kem_ciphertext"),
         ("CLAUSEFORGE_GUARDRAIL_CMD", "guardrail_valid"),
         ("CLAUSEFORGE_OPA_CMD", "policy_allow"),

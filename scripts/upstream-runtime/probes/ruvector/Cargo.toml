@@ -1,0 +1,11 @@
+[package]
+name = "clauseforge-ruvector-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+ruvector-core = { path = "../../../../.upstream-links/ruvector/crates/ruvector-core", default-features = false }
+serde_json = "1"
+
+[workspace]

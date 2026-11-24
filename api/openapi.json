@@ -7,7 +7,7 @@
     "/api/v1/amendments/{correlation}":{"get":{"operationId":"replayAmendment","parameters":[{"name":"correlation","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Verified replay"}}}}
   },
   "components":{"schemas":{
-    "SubmitAmendment":{"type":"object","required":["supplier","amendment","affected_controls","cure_days"],"properties":{"supplier":{"type":"string"},"amendment":{"type":"string"},"affected_controls":{"type":"integer","minimum":1,"maximum":100},"cure_days":{"type":"integer","minimum":1}}},
+    "SubmitAmendment":{"type":"object","required":["supplier","amendment","affected_controls","cure_days"],"properties":{"supplier":{"type":"string"},"amendment":{"type":"string"},"affected_controls":{"type":"integer","minimum":1,"maximum":100},"cure_days":{"type":"integer","minimum":1,"maximum":365}}},
     "AmendmentResponse":{"type":"object","required":["id","correlation_id","status","risk_score","stages","evidence_hash"],"properties":{"id":{"type":"string"},"correlation_id":{"type":"string"},"status":{"type":"string"},"risk_score":{"type":"number"},"stages":{"type":"array","items":{"type":"string"}},"evidence_hash":{"type":"string"}}},
     "ErrorResponse":{"type":"object","required":["code","message","correlation_id"],"properties":{"code":{"type":"string"},"message":{"type":"string"},"correlation_id":{"type":"string"}}}
   }}

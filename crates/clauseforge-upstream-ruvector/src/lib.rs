@@ -24,8 +24,13 @@ pub fn retrieve_neighbors(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-ruvector: {e}")))?;
     if !output.status.success() {
@@ -44,7 +49,7 @@ pub fn retrieve_neighbors(
     Ok(StageResult {
         stage: "upstream-ruvector".into(),
         score: 100.0,
-        message: "retrieve prior recovery neighborhoods".into(),
+        message: "retrieve similar obligation and control neighborhoods".into(),
         evidence: vec![text.trim().into()],
     })
 }

@@ -1,6 +1,6 @@
 use clauseforge_kernel::{AmendmentRequest, DomainError};
 #[test]
-fn rejects_impossible_recovery_window() {
+fn rejects_impossible_cure_period() {
     let r = AmendmentRequest {
         supplier: "checkout".into(),
         amendment: "failover".into(),

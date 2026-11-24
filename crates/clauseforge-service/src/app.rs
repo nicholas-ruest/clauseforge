@@ -1,4 +1,7 @@
-use crate::middleware::{authn, authz_policy, correlation, timeouts, CorrelationId, Principal};
+use crate::middleware::{
+    authn, authz_policy, correlation, normalize_errors, timeouts, validate_request, CorrelationId,
+    Principal,
+};
 use axum::http::StatusCode;
 use axum::{
     extract::{Path, State},
@@ -38,15 +41,17 @@ pub fn router(state: AppState) -> Router {
         )
         .route("/api/v1/amendments/{correlation}", get(get_amendment))
         .route("/api/v1/audit", get(audit))
-        .layer(middleware::from_fn(timeouts))
-        .layer(middleware::from_fn(authz_policy))
-        .layer(middleware::from_fn(authn))
-        .layer(middleware::from_fn(correlation))
         .fallback_service(
             ServeDir::new("frontend/dist")
                 .not_found_service(ServeFile::new("frontend/dist/index.html")),
         )
         .layer(TraceLayer::new_for_http())
+        .layer(middleware::from_fn(timeouts))
+        .layer(middleware::from_fn(normalize_errors))
+        .layer(middleware::from_fn(validate_request))
+        .layer(middleware::from_fn(authz_policy))
+        .layer(middleware::from_fn(authn))
+        .layer(middleware::from_fn(correlation))
         .with_state(state)
 }
 
@@ -97,7 +102,7 @@ fn run_upstreams(request: &AmendmentRequest) -> Result<Vec<StageResult>, DomainE
         required_marker: raw.required_marker,
     };
     stages.push(clauseforge_upstream_fann::infer_risk(&c, request)?);
-    let raw = config("CLAUSEFORGE_MIDSTREAM_CMD", "safety_window")?;
+    let raw = config("CLAUSEFORGE_MIDSTREAM_CMD", "impact_metric")?;
     let c = clauseforge_upstream_midstream::AdapterConfig {
         command: raw.command,
         args: raw.args,

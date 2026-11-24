@@ -1,6 +1,5 @@
-export type SubmitAmendment = { supplier:string; amendment:string; affected_controls:number; cure_days:number };
-export type AmendmentResponse = { id:string; correlation_id:string; status:string; risk_score:number; stages:string[]; evidence_hash:string };
-export type ErrorResponse = { code:string; message:string; correlation_id:string };
+import {API_OPERATIONS, type AmendmentResponse, type ErrorResponse, type SubmitAmendment} from "./generated";
+export type {AmendmentResponse, ErrorResponse, SubmitAmendment} from "./generated";
 export type EvidenceRecord = { id:string; correlation_id:string; payload:string; previous_hash:string; hash:string };
 
 const headers = (role="amendment-reviewer"): HeadersInit => ({
@@ -19,7 +18,7 @@ async function decode<T>(response:Response):Promise<T> {
 
 export const api = {
   create(input:SubmitAmendment, role?:string) {
-    return fetch("/api/v1/amendments",{method:"POST",headers:headers(role),body:JSON.stringify(input)}).then(decode<AmendmentResponse>);
+    return fetch(API_OPERATIONS.submitAmendment.path,{method:API_OPERATIONS.submitAmendment.method,headers:headers(role),body:JSON.stringify(input)}).then(decode<AmendmentResponse>);
   },
-  audit() { return fetch("/api/v1/audit").then(decode<EvidenceRecord[]>); }
+  audit() { return fetch(API_OPERATIONS.readAudit.path).then(decode<EvidenceRecord[]>); }
 };

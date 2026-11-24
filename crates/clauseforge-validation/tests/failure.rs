@@ -6,7 +6,7 @@ fn rejects_domain_boundary() {
         supplier: "checkout".into(),
         amendment: "failover".into(),
         affected_controls: 20,
-        cure_days: 200,
+        cure_days: 366,
         reviewer: "sre@example.com".into(),
     };
     assert!(validate_cure_window(&r).is_err());

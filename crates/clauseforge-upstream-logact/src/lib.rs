@@ -24,8 +24,13 @@ pub fn generate_policy_actions(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-logact: {e}")))?;
     if !output.status.success() {

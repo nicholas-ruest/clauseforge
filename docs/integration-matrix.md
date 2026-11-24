@@ -4,7 +4,7 @@
 |---|---|---|---|---|
 | RuVector `979c31a` | retrieve comparable obligation evidence | upstream-ruvector | `similarity_set` | corrupt index load |
 | ruv-FANN `02431fd` | calibrate amendment exposure | upstream-fann | `calibrated_interval` | invalid quantile/config |
-| midstream `0934fd3` | bound control-signal windows | upstream-midstream | `safety_window` | constraint violation |
+| midstream `0934fd3` | bound control-signal windows | upstream-midstream | `impact_metric` | constraint violation |
 | QuDAG `b534668` | protect reviewer evidence envelope | upstream-qudag | `kem_ciphertext` | security-level mismatch |
 | dspy.ts `200c03a` | rank affected clauses stably | upstream-dspy | `dspy_rank` | invalid limit selects nothing |
 | Guardrail `65df339` | validate nested amendment facts | upstream-guardrail | `guardrail_valid` | missing nested field denies |

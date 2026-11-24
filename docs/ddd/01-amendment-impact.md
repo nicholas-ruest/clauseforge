@@ -6,7 +6,7 @@ A AmendmentIntent captures supplier, amendment, affected control scope, contract
 
 ## Aggregate boundary and invariants
 
-The aggregate rejects empty service/amendment, zero recovery windows and blast radii outside the closed 1–100 range. A validated intent is immutable for the duration of one execution.
+The aggregate rejects empty supplier/amendment fields, cure periods outside 1–365 days and affected-control counts outside the closed 1–100 range. A validated intent is immutable for the duration of one execution.
 
 ## Commands, events and failure semantics
 
