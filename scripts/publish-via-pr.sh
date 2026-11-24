@@ -15,10 +15,11 @@ if gh repo view "$owner/$repo" >/dev/null 2>&1; then
     test "$(gh api "repos/$owner/$repo" --jq .size)" = "0" || { echo PUBLISH_DENIED:repository-not-empty >&2; exit 72; }
   fi
   [[ -z "$remote_product" || "$remote_product" = "$source_sha" ]] || { echo PUBLISH_DENIED:unexpected-product-branch >&2; exit 72; }
-  expected_refs=1
-  [[ -n "$remote_product" ]] && expected_refs=2
-  actual_refs=$(gh api "repos/$owner/$repo/git/matching-refs/heads" --jq length 2>/dev/null || echo 0)
-  test "$actual_refs" -le "$expected_refs" || { echo PUBLISH_DENIED:unexpected-branches >&2; exit 72; }
+  expected_refs=0
+  [[ -n "$remote_main" ]] && ((expected_refs += 1))
+  [[ -n "$remote_product" ]] && ((expected_refs += 1))
+  actual_refs=$(gh api "repos/$owner/$repo/git/matching-refs/heads" --jq length)
+  test "$actual_refs" -eq "$expected_refs" || { echo PUBLISH_DENIED:unexpected-branches >&2; exit 72; }
 else
   gh repo create "$owner/$repo" --public --description "Evidence-bearing supplier AI amendment impact studio"
 fi
