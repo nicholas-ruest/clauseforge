@@ -47,4 +47,4 @@ ClauseForge rehearses decisions; it does not trigger a real supplier amendment. 
 
 Start with [the product specification](docs/specification.md), [architecture](docs/architecture.md), [ADR index](docs/adr/README.md), [DDD index](docs/ddd/README.md), [integration matrix](docs/integration-matrix.md), and [traceability](docs/traceability.md). Exact upstream selection evidence and final suite receipts are intentionally external.
 
-Licensed under Apache-2.0. Upstream projects retain their own licenses and marks; their names identify executed integrations, not endorsement.
+Licensed under MIT. Upstream projects retain their own licenses and marks; their names identify executed integrations, not endorsement.
