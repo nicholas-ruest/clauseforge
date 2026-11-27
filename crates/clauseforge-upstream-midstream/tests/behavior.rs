@@ -2,7 +2,7 @@ use clauseforge_kernel::AmendmentRequest;
 use clauseforge_upstream_midstream::{aggregate_stream, AdapterConfig};
 #[test]
 fn executes_pinned_responsibility() {
-    let c = AdapterConfig::pinned("/bin/sh", vec!["-c".into(), "printf safety_window".into()]);
+    let c = AdapterConfig::pinned("/bin/sh", vec!["-c".into(), "printf impact_metric".into()]);
     let r = AmendmentRequest {
         supplier: "checkout".into(),
         amendment: "failover".into(),

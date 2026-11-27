@@ -1,4 +1,7 @@
-use crate::middleware::{authn, authz_policy, correlation, timeouts, CorrelationId, Principal};
+use crate::middleware::{
+    authn, authz_policy, correlation, normalize_errors, timeouts, validate_request, CorrelationId,
+    Principal,
+};
 use axum::http::StatusCode;
 use axum::{
     extract::{Path, State},
@@ -7,7 +10,7 @@ use axum::{
     routing::{get, post},
     Extension, Json, Router,
 };
-use clauseforge_api_schema::{AmendmentResponse, ErrorResponse, SubmitAmendment};
+use clauseforge_api_schema::{AmendmentResponse, ErrorResponse, StageEvidence, SubmitAmendment};
 use clauseforge_audit::AuditChain;
 use clauseforge_kernel::{AmendmentRequest, DomainError, StageResult};
 use clauseforge_persistence::EvidenceStore;
@@ -38,15 +41,17 @@ pub fn router(state: AppState) -> Router {
         )
         .route("/api/v1/amendments/{correlation}", get(get_amendment))
         .route("/api/v1/audit", get(audit))
-        .layer(middleware::from_fn(timeouts))
-        .layer(middleware::from_fn(authz_policy))
-        .layer(middleware::from_fn(authn))
-        .layer(middleware::from_fn(correlation))
         .fallback_service(
             ServeDir::new("frontend/dist")
                 .not_found_service(ServeFile::new("frontend/dist/index.html")),
         )
         .layer(TraceLayer::new_for_http())
+        .layer(middleware::from_fn(timeouts))
+        .layer(middleware::from_fn(normalize_errors))
+        .layer(middleware::from_fn(validate_request))
+        .layer(middleware::from_fn(authz_policy))
+        .layer(middleware::from_fn(authn))
+        .layer(middleware::from_fn(correlation))
         .with_state(state)
 }
 
@@ -97,7 +102,7 @@ fn run_upstreams(request: &AmendmentRequest) -> Result<Vec<StageResult>, DomainE
         required_marker: raw.required_marker,
     };
     stages.push(clauseforge_upstream_fann::infer_risk(&c, request)?);
-    let raw = config("CLAUSEFORGE_MIDSTREAM_CMD", "safety_window")?;
+    let raw = config("CLAUSEFORGE_MIDSTREAM_CMD", "impact_metric")?;
     let c = clauseforge_upstream_midstream::AdapterConfig {
         command: raw.command,
         args: raw.args,
@@ -181,10 +186,22 @@ async fn create_amendment(
     stages.extend(upstream_stages);
     let risk_score = clauseforge_orchestration::aggregate_score(&stages)
         .map_err(|e| error(e, &correlation.0))?;
+    let stage_names = stages
+        .iter()
+        .map(|stage| stage.stage.clone())
+        .collect::<Vec<_>>();
+    let stage_evidence = stages
+        .iter()
+        .map(|stage| StageEvidence {
+            stage: stage.stage.clone(),
+            score: stage.score,
+            evidence: stage.evidence.clone(),
+        })
+        .collect::<Vec<_>>();
     let id = Uuid::new_v4().to_string();
     let payload =
         serde_json::json!({"id":id,"supplier":request.supplier,"amendment":request.amendment,
-        "risk_score":risk_score,"stages":stages.iter().map(|s|s.stage.clone()).collect::<Vec<_>>()})
+        "risk_score":risk_score,"stages":stage_names,"stage_evidence":stage_evidence})
         .to_string();
     let persisted = state.store.load().map_err(|e| error(e, &correlation.0))?;
     clauseforge_evidence::ledger::verify_chain(&persisted).map_err(|e| error(e, &correlation.0))?;
@@ -215,7 +232,8 @@ async fn create_amendment(
             correlation_id: correlation.0,
             status: "completed".into(),
             risk_score,
-            stages: stages.into_iter().map(|s| s.stage).collect(),
+            stages: stage_names,
+            stage_evidence,
             evidence_hash: record.hash,
         }),
     ))

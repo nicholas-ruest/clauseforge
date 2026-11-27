@@ -1,0 +1,10 @@
+[package]
+name = "clauseforge-qudag-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+qudag-network = { path = "../../../../.upstream-links/qudag/core/network" }
+
+[workspace]

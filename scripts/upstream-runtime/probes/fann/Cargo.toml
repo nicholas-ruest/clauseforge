@@ -1,0 +1,10 @@
+[package]
+name = "clauseforge-fann-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+ruv-fann = { path = "../../../../.upstream-links/ruv-fann", default-features = false }
+
+[workspace]

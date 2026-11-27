@@ -24,12 +24,20 @@ impl SubmitAmendment {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct StageEvidence {
+    pub stage: String,
+    pub score: f64,
+    pub evidence: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AmendmentResponse {
     pub id: String,
     pub correlation_id: String,
     pub status: String,
     pub risk_score: f64,
     pub stages: Vec<String>,
+    pub stage_evidence: Vec<StageEvidence>,
     pub evidence_hash: String,
 }
 

@@ -6,11 +6,11 @@ ExecutionPlan orders accountable domain stages and selected upstream responsibil
 
 ## Aggregate boundary and invariants
 
-All ten domain stages run before seven adapters. Any stage failure aborts the result; partial stage lists are diagnostic only and never sealed as completed.
+All ten domain stages run before eight adapters. Any stage failure aborts the result; partial stage lists are diagnostic only and never sealed as completed.
 
 ## Commands, events and failure semantics
 
-ExecutionCompleted contains exactly seventeen named stages. ExecutionFailed carries the correlation ID and typed cause. Commands entering this context carry the shared correlation identity. Failures are typed and may not be converted into a successful stage or a durable completion record.
+ExecutionCompleted contains exactly eighteen named stages. ExecutionFailed carries the correlation ID and typed cause. Commands entering this context carry the shared correlation identity. Failures are typed and may not be converted into a successful stage or a durable completion record.
 
 ## Ownership and dependencies
 

@@ -24,8 +24,13 @@ pub fn validate_clause_structure(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-guardrail: {e}")))?;
     if !output.status.success() {
@@ -43,8 +48,8 @@ pub fn validate_clause_structure(
     }
     Ok(StageResult {
         stage: "upstream-guardrail".into(),
-        score: 100.0,
-        message: "dispatch an approved recovery tool".into(),
+        score: 0.0,
+        message: "validate the approved amendment clause structure".into(),
         evidence: vec![text.trim().into()],
     })
 }

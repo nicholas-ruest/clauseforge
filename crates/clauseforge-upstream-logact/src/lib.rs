@@ -24,8 +24,13 @@ pub fn generate_policy_actions(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-logact: {e}")))?;
     if !output.status.success() {
@@ -41,9 +46,16 @@ pub fn generate_policy_actions(
             config.required_marker
         )));
     }
+    let score = text
+        .trim()
+        .split(':')
+        .next_back()
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64)
+        .clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-logact".into(),
-        score: 100.0,
+        score,
         message: "generate enforceable mitigation actions".into(),
         evidence: vec![text.trim().into()],
     })

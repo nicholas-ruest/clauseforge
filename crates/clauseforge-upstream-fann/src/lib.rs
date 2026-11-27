@@ -24,8 +24,13 @@ pub fn infer_risk(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-fann: {e}")))?;
     if !output.status.success() {
@@ -41,10 +46,16 @@ pub fn infer_risk(
             config.required_marker
         )));
     }
+    let fields: Vec<&str> = text.trim().split(':').collect();
+    let raw = fields
+        .get(1)
+        .and_then(|v| v.parse::<f64>().ok())
+        .unwrap_or(request.affected_controls as f64 / 100.0);
+    let score = ((raw + 1.0) * 50.0).clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-fann".into(),
-        score: 100.0,
-        message: "infer calibrated recovery risk".into(),
+        score,
+        message: "infer calibrated amendment risk".into(),
         evidence: vec![text.trim().into()],
     })
 }

@@ -3,7 +3,9 @@ use clauseforge_kernel::{AmendmentRequest, DomainError, StageResult};
 pub fn instrument(request: &AmendmentRequest) -> Result<StageResult, DomainError> {
     request.validate_identity()?;
     if request.supplier.len() > 80 {
-        return Err(DomainError::Denied("service label is unbounded".into()));
+        return Err(DomainError::Denied(
+            "supplier identifier exceeds observability label limit".into(),
+        ));
     }
     let score = ((request.supplier.len() + request.amendment.len()) as f64).clamp(0.0, 100.0);
     Ok(StageResult {

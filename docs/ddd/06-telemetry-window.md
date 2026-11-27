@@ -6,7 +6,7 @@ TelemetryWindow represents evidence observed during the bounded contractual cure
 
 ## Aggregate boundary and invariants
 
-Midstream contributes safety-window ingestion while the domain telemetry stage checks that the requested recovery window and service context are usable.
+Midstream contributes safety-window ingestion while the domain telemetry stage checks that the contractual cure period and supplier context are usable.
 
 ## Commands, events and failure semantics
 

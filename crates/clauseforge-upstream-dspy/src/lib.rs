@@ -24,8 +24,13 @@ pub fn rank_clause_priority(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-dspy: {e}")))?;
     if !output.status.success() {
@@ -41,9 +46,20 @@ pub fn rank_clause_priority(
             config.required_marker
         )));
     }
+    let score_values = text.trim().split(':').nth(2).unwrap_or_default();
+    let scores: Vec<f64> = score_values
+        .split(',')
+        .filter_map(|v| v.parse::<f64>().ok())
+        .collect();
+    let score = if scores.is_empty() {
+        request.affected_controls as f64
+    } else {
+        scores.iter().sum::<f64>() / scores.len() as f64
+    }
+    .clamp(0.0, 100.0);
     Ok(StageResult {
         stage: "upstream-dspy".into(),
-        score: 100.0,
+        score,
         message: "publish correlated amendment event".into(),
         evidence: vec![text.trim().into()],
     })

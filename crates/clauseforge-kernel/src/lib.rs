@@ -48,7 +48,7 @@ impl AmendmentRequest {
         if self.affected_controls > 100 {
             return Err(DomainError::Range("affected_controls"));
         }
-        if self.cure_days == 0 || self.cure_days > 1440 {
+        if self.cure_days == 0 || self.cure_days > 365 {
             return Err(DomainError::Range("cure_days"));
         }
         Ok(())

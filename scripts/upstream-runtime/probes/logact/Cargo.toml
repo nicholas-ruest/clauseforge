@@ -1,0 +1,14 @@
+[package]
+name = "clauseforge-logact-probe"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+agent_bus_proto-rust = { path = "../../../../.upstream-links/logact/bus/proto" }
+futures = "0.3.34"
+logact_commit_service_api = { path = "../../../../.upstream-links/logact/logact/commit_service/api" }
+logact_commit_service_engine = { path = "../../../../.upstream-links/logact/logact/commit_service/impls/v1/engine" }
+logact_commit_service_policy_register = { path = "../../../../.upstream-links/logact/logact/commit_service/policy_register" }
+
+[workspace]

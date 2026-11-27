@@ -24,8 +24,13 @@ pub fn seal_envelope(
     request.validate_identity()?;
     let output = Command::new(&config.command)
         .args(&config.args)
-        .env("CLAUSEFORGE_SERVICE", &request.supplier)
-        .env("CLAUSEFORGE_SCENARIO", &request.amendment)
+        .env("CLAUSEFORGE_SUPPLIER", &request.supplier)
+        .env("CLAUSEFORGE_AMENDMENT", &request.amendment)
+        .env(
+            "CLAUSEFORGE_AFFECTED_CONTROLS",
+            request.affected_controls.to_string(),
+        )
+        .env("CLAUSEFORGE_CURE_DAYS", request.cure_days.to_string())
         .output()
         .map_err(|e| DomainError::Upstream(format!("upstream-qudag: {e}")))?;
     if !output.status.success() {
@@ -43,7 +48,7 @@ pub fn seal_envelope(
     }
     Ok(StageResult {
         stage: "upstream-qudag".into(),
-        score: 100.0,
+        score: 0.0,
         message: "seal post-quantum command envelope".into(),
         evidence: vec![text.trim().into()],
     })
